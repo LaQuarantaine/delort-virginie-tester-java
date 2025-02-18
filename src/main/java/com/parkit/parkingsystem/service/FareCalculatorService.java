@@ -10,19 +10,26 @@ public class FareCalculatorService {
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
         }
 
-        int inHour = ticket.getInTime().getHours();
-        int outHour = ticket.getOutTime().getHours();
+        long inTimeMillis = ticket.getInTime().getTime();
+        long outTimeMillis = ticket.getOutTime().getTime();
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
-        int duration = outHour - inHour;
+        /**
+        changement pour tenir compte de l'ensemble date et heure précise 
+        et non plus le seul chiffre des heures, ce qui ignorait les minutes 
+        et le changement de jour 
+        la méthode calculateFare() s'appliquant aussi bien aux voitures qu'au 
+        velo, cela solutionne les 3 erreurs
+        */
+        long durationMillis = outTimeMillis - inTimeMillis;
+        double durationHours = durationMillis / (1000.0 * 60 * 60);
 
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
-                ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
+                ticket.setPrice(durationHours * Fare.CAR_RATE_PER_HOUR);
                 break;
             }
             case BIKE: {
-                ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
+                ticket.setPrice(durationHours * Fare.BIKE_RATE_PER_HOUR);
                 break;
             }
             default: throw new IllegalArgumentException("Unkown Parking Type");
