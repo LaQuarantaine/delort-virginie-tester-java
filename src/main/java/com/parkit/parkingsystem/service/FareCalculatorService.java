@@ -14,15 +14,19 @@ public class FareCalculatorService {
         long outTimeMillis = ticket.getOutTime().getTime();
 
         /**
-        changement pour tenir compte de l'ensemble date et heure précise 
-        et non plus le seul chiffre des heures, ce qui ignorait les minutes 
-        et le changement de jour 
-        la méthode calculateFare() s'appliquant aussi bien aux voitures qu'au 
-        velo, cela solutionne les 3 erreurs
+         * changement pour tenir compte de l'ensemble date et heure précise 
+         * et non plus le seul chiffre des heures, ce qui ignorait les minutes 
+         * et le changement de jour. La méthode calculateFare() s'appliquant 
+         * aussi bien aux voitures qu'au velo, cela solutionne les 3 erreurs
         */
         long durationMillis = outTimeMillis - inTimeMillis;
         double durationHours = durationMillis / (1000.0 * 60 * 60);
-
+        
+        if (durationMillis < (30 * 60* 1000)) {
+        	ticket.setPrice(0.0);
+        }
+        
+        else {
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
                 ticket.setPrice(durationHours * Fare.CAR_RATE_PER_HOUR);
@@ -33,6 +37,7 @@ public class FareCalculatorService {
                 break;
             }
             default: throw new IllegalArgumentException("Unkown Parking Type");
+        }
         }
     }
 }
