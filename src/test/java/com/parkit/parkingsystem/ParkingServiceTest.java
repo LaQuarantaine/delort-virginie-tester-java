@@ -30,7 +30,8 @@ public class ParkingServiceTest {
     @Mock
     private static TicketDAO ticketDAO;
 
-    @BeforeEach
+
+    @BeforeEach 
     private void setUpPerTest() {
         try {
             when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
@@ -51,11 +52,11 @@ public class ParkingServiceTest {
             throw  new RuntimeException("Failed to set up test mock objects");
         }
     }
-
+ 
     @Test
     public void processExitingVehicleTest(){
         parkingService.processExitingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
-
+    
 }

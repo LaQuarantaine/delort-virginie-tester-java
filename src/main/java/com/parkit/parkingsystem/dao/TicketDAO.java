@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.util.Map;
 
 public class TicketDAO {
 
@@ -36,9 +37,9 @@ public class TicketDAO {
             logger.error("Error fetching next available slot",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
-            return false;
+        }return false;
         }
-    }
+
 
     public Ticket getTicket(String vehicleRegNumber) {
         Connection con = null;
@@ -65,9 +66,9 @@ public class TicketDAO {
             logger.error("Error fetching next available slot",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
+        }
             return ticket;
         }
-    }
 
     public boolean updateTicket(Ticket ticket) {
         Connection con = null;
@@ -86,4 +87,26 @@ public class TicketDAO {
         }
         return false;
     }
+    
+    public int getNbTicket(String vehicleRegNumber) {
+    	int nbTickets = 0 ;
+    	
+    	try (Connection con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.NB_TICKET)) {
+            	
+            ps.setString(1,vehicleRegNumber);
+            
+            try (ResultSet rs = ps.executeQuery()){
+                 if(rs.next()){ 
+                	 nbTickets= rs.getInt(1);
+                 }
+            }
+
+        }catch (Exception ex){
+            logger.error("Error get number tickets",ex);
+        }
+    	
+        return nbTickets;
+    }
+    
 }
