@@ -120,4 +120,18 @@ public class ParkingServiceTest {
     	verify(ticketDAO, times(1)).getNbTicket("ABCDEF"); 
     	
     }
+    
+    @Test
+    @DisplayName("Vérifier la non mise à jour du parking si UpdateTicket échoue ")
+    public void processExitingVehicleUnableUpdate() {
+    	// Given
+        when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
+        
+        // When
+	    parkingService.processExitingVehicle();
+	    
+	    // Then
+    	verify(ticketDAO, Mockito.times(1)).updateTicket(any(Ticket.class));
+    	verify(parkingSpotDAO, Mockito.never()).updateParking(any(ParkingSpot.class));
+    }
 }
