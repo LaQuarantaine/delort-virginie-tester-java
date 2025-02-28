@@ -87,7 +87,7 @@ public class TicketDAO {
         }
         return false;
     }
-    
+     
     public int getNbTicket(String vehicleRegNumber) {
     	int nbTickets = 0 ;
     	

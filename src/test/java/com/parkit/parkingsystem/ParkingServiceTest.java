@@ -184,4 +184,17 @@ public class ParkingServiceTest {
     	//Then
         assertNull(result);
     }
+    
+    @Test
+    @DisplayName("Vérifier qu'un numéro de parking n'est pas trouvé suite à saisie erronnée par utilisateur")
+    public void testGetNextParkingNumberIfAvailableParkingNumberWrongArgument(){
+    	// Given
+    	when(inputReaderUtil.readSelection()).thenReturn(3); 
+
+    	// When
+    	ParkingSpot result = parkingService.getNextParkingNumberIfAvailable();
+    	
+    	//Then
+        assertNull(result);
+    }
 }
