@@ -18,6 +18,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +42,7 @@ public class ParkingServiceTest {
     @DisplayName("Préparation du test : Initialisation des mocks et des objets nécessaires")
     private void setUpPerTest() {
         try {
-            when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+            lenient().when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
 
             ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
             Ticket ticket = new Ticket();
@@ -122,7 +126,7 @@ public class ParkingServiceTest {
     }
     
     @Test
-    @DisplayName("Vérifier la non mise à jour du parking si UpdateTicket échoue ")
+    @DisplayName("Vérifier que si la mise à jour du ticket échoue, la mise à jour du parking n'a pas lieu ")
     public void processExitingVehicleUnableUpdate() {
     	// Given
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
@@ -133,5 +137,51 @@ public class ParkingServiceTest {
 	    // Then
     	verify(ticketDAO, Mockito.times(1)).updateTicket(any(Ticket.class));
     	verify(parkingSpotDAO, Mockito.never()).updateParking(any(ParkingSpot.class));
+    }
+    
+    @Test
+    @DisplayName("Vérifier qu'une place de parking est disponible pour une voiture")
+    public void testGetNextParkingNumberIfAvailable_ShouldReturnAvailableParkingSpot(){
+    	// Given
+    	when(inputReaderUtil.readSelection()).thenReturn(1); 
+    	when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
+    	
+    	// When
+    	ParkingSpot result = parkingService.getNextParkingNumberIfAvailable();
+    	
+    	//Then
+    	assertNotNull(result);
+        assertEquals(1, result.getId());
+        assertTrue(result.isAvailable());
+    }
+    
+    @Test
+    @DisplayName("Vérifier qu'une place de parking est disponible pour une moto")
+    public void testGetNextParkingNumberIfAvailable_ShouldReturnAvailableParkingSpotForBike(){
+    	// Given
+    	when(inputReaderUtil.readSelection()).thenReturn(2); 
+    	when(parkingSpotDAO.getNextAvailableSlot(ParkingType.BIKE)).thenReturn(1);
+    	
+    	// When
+    	ParkingSpot result = parkingService.getNextParkingNumberIfAvailable();
+    	
+    	//Then
+    	assertNotNull(result);
+        assertEquals(1, result.getId());
+        assertTrue(result.isAvailable());
+    } 
+    
+    @Test
+    @DisplayName("Vérifier qu'un numéro de parking n'est pas trouvé")
+    public void testGetNextParkingNumberIfAvailableParkingNumberNotFound(){
+    	// Given
+    	when(inputReaderUtil.readSelection()).thenReturn(1); 
+    	when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(0);
+    	
+    	// When
+    	ParkingSpot result = parkingService.getNextParkingNumberIfAvailable();
+    	
+    	//Then
+        assertNull(result);
     }
 }
