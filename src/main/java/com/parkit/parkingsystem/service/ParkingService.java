@@ -32,58 +32,80 @@ public class ParkingService {
     public void processIncomingVehicle() {
         try{
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
-            if(parkingSpot !=null && parkingSpot.getId() > 0){
-                String vehicleRegNumber = getVehicleRegNumber();
-                parkingSpot.setAvailable(false);
-                parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark it's availability as false
+            
+            if (parkingSpot == null) {
+            	return;
+            }
 
-                Date inTime = new Date();
-                Ticket ticket = new Ticket();
+            String vehicleRegNumber = getVehicleRegNumber();
+            
+            // ajout d'un controle dans BDD sur l'unicité de l'immatriculation
+            if (ticketDAO.isVehicleAlreadyParked(vehicleRegNumber)) {
+                System.out.println("Un véhicule avec cette immatriculation est déjà garé !");
+                return;
+            }
+            // sauvegarde de la table parking déplacée APRES maj table ticket pour ne pas bloquer une place si aucun ticket n'est généré
+
+            Date inTime = new Date();
+            Ticket ticket = new Ticket();
                 //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
                 //ticket.setId(ticketID);
-                ticket.setParkingSpot(parkingSpot);
-                ticket.setVehicleRegNumber(vehicleRegNumber);
-                ticket.setPrice(0);
-                ticket.setInTime(inTime);
-                ticket.setOutTime(null);
-                ticketDAO.saveTicket(ticket);
+            ticket.setParkingSpot(parkingSpot);
+            ticket.setVehicleRegNumber(vehicleRegNumber);
+            ticket.setPrice(0);
+            ticket.setInTime(inTime);
+            ticket.setOutTime(null);
+            
+            ticketDAO.saveTicket(ticket);
                 
-                int nbTickets = ticketDAO.getNbTicket(vehicleRegNumber);
-                 
-                if (nbTickets > 1) {
-                	System.out.println("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%");
-                } else {
-                	System.out.println("Generated Ticket and saved in DB");
-                	System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
-                	System.out.println("Recorded in-time for vehicle number:"+vehicleRegNumber+" is:"+inTime);
-                }
-              }
+                //mise à jour BDD déplacée APRES enregistrement du ticket
+            parkingSpot.setAvailable(false); 
+            parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark it's availability as false
+                
+            int nbTickets = ticketDAO.getNbTicket(vehicleRegNumber);
+            
+            //ajout de logger en remplacement de messages console inapproprié pour un utilisateur
+            logger.info("Generated Ticket and saved in DB");
+            logger.info("Recorded in-time for vehicle number :"+vehicleRegNumber+" is: "+inTime );
+            
+            if (nbTickets > 1) {
+                System.out.println("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%");
+                System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
+            } else {
+                System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
+            } 
+
         }catch(Exception e){
             logger.error("Unable to process incoming vehicle",e);
         }
     }
-
+ 
     private String getVehicleRegNumber() throws Exception {
         System.out.println("Please type the vehicle registration number and press enter key");
         return inputReaderUtil.readVehicleRegistrationNumber();
     }
 
     public ParkingSpot getNextParkingNumberIfAvailable(){
-        int parkingNumber=0;
-        ParkingSpot parkingSpot = null;
+    	ParkingSpot parkingSpot = null;
+        
         try{
             ParkingType parkingType = getVehicleType();
-            parkingNumber = parkingSpotDAO.getNextAvailableSlot(parkingType);
+                        
+            int parkingNumber = parkingSpotDAO.getNextAvailableSlot(parkingType);
+                        
             if(parkingNumber > 0){
                 parkingSpot = new ParkingSpot(parkingNumber,parkingType, true);
+                System.out.println("Soyez le(la) bienvenu(e) !");
             }else{
-                throw new Exception("Error fetching parking number from DB. Parking slots might be full");
+            	System.out.println ("Aucune place " +parkingType+ " disponible"); //ajout message console
             }
         }catch(IllegalArgumentException ie){
             logger.error("Error parsing user input for type of vehicle", ie);
+            
         }catch(Exception e){
             logger.error("Error fetching next available parking slot", e);
         }
+        
         return parkingSpot;
     }
 
@@ -110,9 +132,25 @@ public class ParkingService {
         try{
             String vehicleRegNumber = getVehicleRegNumber();
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
+            
+            // message utilisateur en cas d'erreur de saisie de l'immatriculation
+            if (ticket == null) {
+                System.out.println("Erreur : Aucun ticket trouvé pour le véhicule " + vehicleRegNumber);
+                return;
+            }
+
+            /** message utilisateur si la sortie a deja été enregistrée afin de ne pas recalculer un prix
+            concretement un utilisateur aurait selectionner sortie dans le menu au lieu d'entrer
+            if (ticket.getOutTime() != null) {
+                System.out.println("Erreur : Ce véhicule a déjà quitté le parking ! ");
+                return;
+            }
+            */
+            
             Date outTime = new Date();
             ticket.setOutTime(outTime);
             
+            // adapter le tarif en fonction du type d'utilisateur (régulier ou occassionnel)
             if (ticketDAO.getNbTicket(vehicleRegNumber) > 1) {
             	fareCalculatorService.calculateFare(ticket, true);
             } else {

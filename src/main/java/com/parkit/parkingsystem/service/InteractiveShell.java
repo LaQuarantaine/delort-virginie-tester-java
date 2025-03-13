@@ -25,7 +25,13 @@ public class InteractiveShell {
 
         while(continueApp){
             loadMenu();
+            
             int option = inputReaderUtil.readSelection();
+
+            if (option==-1) {
+            	continue;
+            }
+            
             switch(option){
                 case 1: {
                     parkingService.processIncomingVehicle();

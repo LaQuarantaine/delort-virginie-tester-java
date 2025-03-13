@@ -97,16 +97,34 @@ public class TicketDAO {
             ps.setString(1,vehicleRegNumber);
             
             try (ResultSet rs = ps.executeQuery()){
-                 if(rs.next()){ 
-                	 nbTickets= rs.getInt(1);
+                 if(rs.next()) {
+                	 nbTickets = rs.getInt(1);
                  }
             }
+         }catch (Exception ex){
+            	logger.error("Error get number tickets",ex);
+            }
 
-        }catch (Exception ex){
-            logger.error("Error get number tickets",ex);
-        }
-    	
-        return nbTickets;
+    	return nbTickets;
     }
-    
+
+    // ajout d'une méthode pour contrôler l'unicité d'une immatriculation
+	public boolean isVehicleAlreadyParked(String vehicleRegNumber) {
+		boolean vehicleAlreadyParked = false;
+		
+		try (Connection con = dataBaseConfig.getConnection();
+	        PreparedStatement ps = con.prepareStatement(DBConstants.IS_VEHICLE_ALREADY_PARKED)) {
+	            	
+	        ps.setString(1,vehicleRegNumber);
+            
+	        try (ResultSet rs = ps.executeQuery()){
+                 if(rs.next() && rs.getInt(1) > 0){ 
+                	 vehicleAlreadyParked = true;
+                 }
+	        }
+        } catch (Exception ex) {
+            	logger.error("Erreur lors de la vérification de l'immatriculation",ex);
+            }
+		return vehicleAlreadyParked;
+	}
 }
