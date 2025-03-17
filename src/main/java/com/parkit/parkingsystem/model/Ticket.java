@@ -1,6 +1,5 @@
 package com.parkit.parkingsystem.model;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class Ticket {
@@ -11,6 +10,18 @@ public class Ticket {
     private Date inTime;
     private Date outTime;
 
+    
+    public Ticket (ParkingSpot parkingSpot, String vehicleRegNumber, Date inTime) {
+    	if (parkingSpot == null || vehicleRegNumber == null || vehicleRegNumber.trim().isEmpty() || inTime == null) {
+    		throw new IllegalArgumentException ("Ticket invalide : ParkingSpot, vehicleRegNumber, inTime sont nécessaires.");
+    	}
+    	this.parkingSpot = parkingSpot;
+    	this.vehicleRegNumber = vehicleRegNumber;
+    	this.price = 0.0;
+    	this.inTime = inTime;
+    	this.outTime = null;
+    }
+    
     public int getId() {
         return id;
     }
@@ -24,6 +35,9 @@ public class Ticket {
     }
 
     public void setParkingSpot(ParkingSpot parkingSpot) {
+    	if (parkingSpot == null) {
+    		throw new IllegalArgumentException(" ParkingSpot ne peut pas être null.");
+    	}
         this.parkingSpot = parkingSpot;
     }
 
@@ -32,6 +46,9 @@ public class Ticket {
     }
 
     public void setVehicleRegNumber(String vehicleRegNumber) {
+    	if (vehicleRegNumber == null || vehicleRegNumber.trim().isEmpty()) {
+    		throw new IllegalArgumentException("L'immatriculation ne peut pas être vide.");
+    	}
         this.vehicleRegNumber = vehicleRegNumber;
     }
 
@@ -40,6 +57,9 @@ public class Ticket {
     }
 
     public void setPrice(double price) {
+    	if (price < 0.0) {
+    		throw new IllegalArgumentException("Le prix ne peut pas être négatif."); 
+    	}
         this.price = price;
     }
 
@@ -48,6 +68,9 @@ public class Ticket {
     }
 
     public void setInTime(Date inTime) {
+    	if (inTime !=null && inTime.after(outTime)) {
+    		throw new IllegalArgumentException("L'heure d'entrée ne peut pas être postérieure à l'heure de sortie.");
+    	}
         this.inTime = inTime;
     }
 
@@ -56,6 +79,9 @@ public class Ticket {
     }
 
     public void setOutTime(Date outTime) {
+    	if (outTime !=null && inTime !=null && outTime.before(inTime)) {
+    		throw new IllegalArgumentException("L'heure de sortie ne peut pas être antérieure à l'heure d'entrée.");
+    	}
         this.outTime = outTime;
     }
 }
