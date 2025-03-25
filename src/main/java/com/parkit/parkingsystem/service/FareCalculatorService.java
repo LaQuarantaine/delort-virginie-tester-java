@@ -5,66 +5,56 @@ import java.math.RoundingMode;
 
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.dao.TicketDAO;
 
 public class FareCalculatorService {
 
-	public FareCalculatorService() {
-		
-	}
-    public void calculateFare(Ticket ticket, boolean discount){
-        if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
-            throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
+
+	public void calculateFare(Ticket ticket, boolean discount){
+        if (ticket == null || ticket.getParkingSpot() == null || ticket.getInTime() == null) {
+        	throw new IllegalArgumentException("Données manquantes pour ticket.");
         }
-
-        long inTimeMillis = ticket.getInTime().getTime();
-        long outTimeMillis = ticket.getOutTime().getTime();
-
-        long durationMillis = outTimeMillis - inTimeMillis;
-        double durationHours = durationMillis / (1000.0 * 60 * 60);
+		if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
+            throw new IllegalArgumentException("Erreur sur heure de sortie : "+ticket.getOutTime().toString());
+        }
         
-        if (durationMillis < (30 * 60* 1000)) {
+		long durationMillis = Duration.getDurationMillis(ticket.getInTime(), ticket.getOutTime());
+
+        if (durationMillis < Fare.FREE_PARKING_DURATION) {
         	ticket.setPrice(0.0);
+        	return;
         } 
         
-        else if (durationMillis >= (30 * 60* 1000) && discount == true) {
-        	switch (ticket.getParkingSpot().getParkingType()){
+        double durationHours = Duration.getDurationToHoursDecimal(durationMillis); 
+        
+        double price;
+         	switch (ticket.getParkingSpot().getParkingType()){
         		case CAR: {
-        		double price = durationHours * Fare.CAR_RATE_PER_HOUR * 0.95;
-                BigDecimal bd = new BigDecimal(price).setScale(2, RoundingMode.HALF_UP);
-                ticket.setPrice(bd.doubleValue()); // Met à jour avec l'arrondi
-        		break;
+        		price = durationHours * Fare.CAR_RATE_PER_HOUR;
+                break;
         		}
         		case BIKE: {
-        		double price = durationHours * Fare.BIKE_RATE_PER_HOUR * 0.95;
-                BigDecimal bd = new BigDecimal(price).setScale(2, RoundingMode.HALF_UP);
-                ticket.setPrice(bd.doubleValue()); // Met à jour avec l'arrondi
+        		price = durationHours * Fare.BIKE_RATE_PER_HOUR;
                 break;
         		}
             default: throw new IllegalArgumentException("Unkown Parking Type");
         	}
+        
+        if (discount) {
+        	price *= Fare.COEF_DISCOUNT;
         }
+        	
+    	ticket.setPrice(roundPrice(price));
+	}      
         
-        else 
-        	switch (ticket.getParkingSpot().getParkingType()){
-    		case CAR: {
-    		double price = durationHours * Fare.CAR_RATE_PER_HOUR;
-            BigDecimal bd = new BigDecimal(price).setScale(2, RoundingMode.HALF_UP);
-            ticket.setPrice(bd.doubleValue()); // Met à jour avec l'arrondi
-            break;
-    		}
-    		case BIKE: {
-    		double price = durationHours * Fare.BIKE_RATE_PER_HOUR;
-            BigDecimal bd = new BigDecimal(price).setScale(2, RoundingMode.HALF_UP);
-            ticket.setPrice(bd.doubleValue()); // Met à jour avec l'arrondi
-            break;
-    		}
-        default: throw new IllegalArgumentException("Unkown Parking Type");
-    	}
+	private double roundPrice (double price) {
+		return new BigDecimal(price).setScale(2, RoundingMode.HALF_UP).doubleValue();
+	}
+	
+	
+	public void calculateFare(Ticket ticket){
+    	calculateFare(ticket, false);
     }
-        
-        
-       public void calculateFare(Ticket ticket){
-    	   calculateFare(ticket, false);
-       }
 
+	
 }

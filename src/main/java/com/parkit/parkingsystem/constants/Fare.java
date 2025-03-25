@@ -6,5 +6,5 @@ public class Fare {
     
   //ajout constantes métier
   	public static final double COEF_DISCOUNT = 0.95;	// soit 5% de remise pour les utilisateurs réguliers
-  	public static final int FREE_PARKING_DURATION = 30 * 60 * 1000; // soit 30 min en millissecondes, durée de stationnement gratuite
+  	public static final int FREE_PARKING_DURATION = 30 * 60 * 1000; // Gratuité si stationnement inf à 30 min
 }

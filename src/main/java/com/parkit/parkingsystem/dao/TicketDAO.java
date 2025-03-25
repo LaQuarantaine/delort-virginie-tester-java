@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.Map;
 
 public class TicketDAO {
 
@@ -66,9 +65,10 @@ public class TicketDAO {
             logger.error("Error fetching next available slot",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
-        }
             return ticket;
         }
+    }
+
 
     public boolean updateTicket(Ticket ticket) {
         Connection con = null;

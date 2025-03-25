@@ -15,7 +15,7 @@ public class ParkingSpotDAO {
     private static final Logger logger = LogManager.getLogger("ParkingSpotDAO");
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
-
+ 
     public int getNextAvailableSlot(ParkingType parkingType){
         Connection con = null; //déclare une connection
         int result= -1; //permet de déclarer aucun emplacement trouvé par défaut
@@ -30,7 +30,9 @@ public class ParkingSpotDAO {
             if(rs.next()){	//si la requete retourne un résultat
             	result = rs.getInt(1);
             }
-
+            
+            logger.info("Place trouvée pour " + parkingType + " : " + result);
+            
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
         }catch (Exception ex){
@@ -59,5 +61,7 @@ public class ParkingSpotDAO {
             dataBaseConfig.closeConnection(con);
         }
     }
+
+
 
 }

@@ -1,6 +1,5 @@
 package com.parkit.parkingsystem.service;
 
-import com.parkit.parkingsystem.service.FareCalculatorService;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.util.InputReaderUtil;
@@ -17,12 +16,25 @@ public class InteractiveShell {
         System.out.println("Welcome to Parking System!");
 
         boolean continueApp = true;
-        InputReaderUtil inputReaderUtil = new InputReaderUtil();
-        ParkingSpotDAO parkingSpotDAO = new ParkingSpotDAO();
-        TicketDAO ticketDAO = new TicketDAO();
-        FareCalculatorService fareCalculatorService = new FareCalculatorService();
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, fareCalculatorService);
+        
+        InputReaderUtil inputReaderUtil;
+        ParkingSpotDAO parkingSpotDAO;
+        TicketDAO ticketDAO;
+        FareCalculatorService fareCalculatorService;
+        ParkingService parkingService;
 
+        try {
+        	inputReaderUtil = new InputReaderUtil();
+        	parkingSpotDAO = new ParkingSpotDAO();
+        	ticketDAO = new TicketDAO();
+        	fareCalculatorService = new FareCalculatorService();
+        	parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO, fareCalculatorService);
+        } catch (Exception e) {
+        	logger.fatal("Critical error during system initialization", e);
+            System.out.println("Erreur critique au démarrage, l'application va fermer !");
+            return; 
+        }
+        
         while(continueApp){
             loadMenu();
             
@@ -32,24 +44,30 @@ public class InteractiveShell {
             	continue;
             }
             
-            switch(option){
-                case 1: {
-                    parkingService.processIncomingVehicle();
-                    break;
-                }
-                case 2: {
-                    parkingService.processExitingVehicle();
-                    break;
-                }
-                case 3: {
-                    System.out.println("Exiting from the system!");
-                    continueApp = false;
-                    break;
-                }
-                default: System.out.println("Unsupported option. Please enter a number corresponding to the provided menu");
+            try {
+            	switch(option){
+                	case 1: {
+                		parkingService.processIncomingVehicle();
+                		break;
+                	}
+                	case 2: {
+                		parkingService.processExitingVehicle();
+                		break;
+                	}
+                	case 3: {
+                		System.out.println("Exiting from the system!");
+                		continueApp = false;
+                		break;
+                	}
+                	default: System.out.println("Unsupported option. Please enter a number corresponding to the provided menu");
+            	}
+            } catch (Exception e) {
+        	logger.error("An unexpected error occurred during processing", e);
+            System.out.println("A technical error occurred. Please try again.");
             }
         }
     }
+        
 
     private static void loadMenu(){
         System.out.println("Please select an option. Simply enter the number to choose an action");

@@ -82,7 +82,7 @@ public class FareCalculatorServiceTest {
         
         fareCalculatorService.calculateFare(ticket);
         
-        assertEquals(0.0 , ticket.getPrice());
+        assertEquals(0.0, ticket.getPrice());
     }
     
     // US4 – En tant qu’utilisateur BIKE, je veux une facturation proportionnelle si je reste moins d’une heure
@@ -112,7 +112,9 @@ public class FareCalculatorServiceTest {
         double ExpectedPrice = 2.5 * Fare.BIKE_RATE_PER_HOUR * Fare.COEF_DISCOUNT;
         BigDecimal bd = new BigDecimal(ExpectedPrice).setScale(2, RoundingMode.HALF_UP);
         
-        assertEquals((bd.doubleValue()) , ticket.getPrice());;
+        System.out.println("Tarif attendu : " + ExpectedPrice);
+        System.out.println("Tarif calculé : " + ticket.getPrice());
+        assertEquals((bd.doubleValue()), ticket.getPrice());;
     }
 
     // US5 – En tant qu’utilisateur CAR régulier, je veux bénéficier de la remise prévue
@@ -126,7 +128,7 @@ public class FareCalculatorServiceTest {
         double ExpectedPrice = 1.5 * Fare.CAR_RATE_PER_HOUR * Fare.COEF_DISCOUNT;
         BigDecimal bd = new BigDecimal(ExpectedPrice).setScale(2, RoundingMode.HALF_UP);
         
-        assertEquals((bd.doubleValue()) , ticket.getPrice());
+        assertEquals((bd.doubleValue()), ticket.getPrice());
     }
     
     
@@ -143,7 +145,7 @@ public class FareCalculatorServiceTest {
         double ExpectedPrice = 2 * Fare.CAR_RATE_PER_HOUR;
         BigDecimal bd = new BigDecimal(ExpectedPrice).setScale(2, RoundingMode.HALF_UP);
         
-        assertEquals((bd.doubleValue()) , ticket.getPrice());
+        assertEquals((bd.doubleValue()), ticket.getPrice());
     }
 
     
@@ -160,7 +162,7 @@ public class FareCalculatorServiceTest {
         double ExpectedPrice = 24 * Fare.CAR_RATE_PER_HOUR;
         BigDecimal bd = new BigDecimal(ExpectedPrice).setScale(2, RoundingMode.HALF_UP);
         
-        assertEquals((bd.doubleValue()) , ticket.getPrice());
+        assertEquals((bd.doubleValue()), ticket.getPrice());
     }
     
         
