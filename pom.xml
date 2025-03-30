@@ -120,12 +120,22 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.10</version>
                 <executions>
+                
                     <execution>
                         <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+                    
+                    <execution>
+            			<id>prepare-agent-integration</id>
+            			<phase>pre-integration-test</phase>
+           				<goals>
+                			<goal>prepare-agent</goal>
+            			</goals>
+        			</execution>
+        			
                     <execution>
                         <id>jacoco-report</id>
                         <phase>test</phase>
@@ -133,6 +143,15 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+                    
+                    <execution>
+            			<id>report-integration</id>
+            			<phase>verify</phase>
+            			<goals>
+                			<goal>report</goal>
+            			</goals>
+        			</execution>
+        			
                 </executions>
             </plugin>
 

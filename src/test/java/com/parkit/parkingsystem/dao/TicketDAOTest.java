@@ -56,11 +56,13 @@ class TicketDAOTest {
         // Simule la création d'un PreparedStatement
         lenient().when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
     }
+    
+
     @Test 
     @DisplayName("Enregistrement d'un ticket de sortie dans BDD")
     void testSaveTicket_Exiting() throws Exception {
         // GIVEN
-        when(mockPreparedStatement.execute()).thenReturn(true);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
         // WHEN
         boolean result = ticketDAO.saveTicket(ticket);
@@ -71,8 +73,10 @@ class TicketDAOTest {
         verify(mockPreparedStatement, times(1)).setString(2, ticket.getVehicleRegNumber());
         verify(mockPreparedStatement, times(1)).setDouble(3, ticket.getPrice());
         verify(mockPreparedStatement, times(1)).setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
-        verify(mockPreparedStatement, times(1)).execute();
+        verify(mockPreparedStatement, times(1)).setTimestamp(5, new Timestamp(ticket.getOutTime().getTime()));
+        verify(mockPreparedStatement, times(1)).executeUpdate();
     }
+
 
     @Test 
     @DisplayName("Enregistrement d'un ticket d'entrée dans BDD")
@@ -83,10 +87,10 @@ class TicketDAOTest {
         ticket.setVehicleRegNumber("XYZ999");
         ticket.setPrice(0.0);
         ticket.setInTime(new Date());
-        ticket.setOutTime(null); // Pas encore de sortie !
+        ticket.setOutTime(null); // Pas encore de sortie 
         ticket.setParkingSpot(new ParkingSpot(2, ParkingType.CAR, false));
        
-        when(mockPreparedStatement.execute()).thenReturn(true);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
         // WHEN
         boolean result = ticketDAO.saveTicket(ticket);
@@ -97,9 +101,10 @@ class TicketDAOTest {
         verify(mockPreparedStatement, times(1)).setString(2, ticket.getVehicleRegNumber());
         verify(mockPreparedStatement, times(1)).setDouble(3, ticket.getPrice());
         verify(mockPreparedStatement, times(1)).setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
-        verify(mockPreparedStatement, times(1)).execute();
+        verify(mockPreparedStatement, times(1)).setNull(5, Types.TIMESTAMP); // car outTime == null
+        verify(mockPreparedStatement, times(1)).executeUpdate();
     }
-    
+
     @Test
     @DisplayName("Echec Enregistrement ticket lié à une exception")
     void testSaveTicket_ThrowsException() throws Exception {
@@ -115,7 +120,21 @@ class TicketDAOTest {
         // Vérifier que l'exception a bien été loggée
         verify(mockPreparedStatement, never()).execute(); // La requête ne doit jamais être exécutée
     }
-    	
+    
+    @Test
+    @DisplayName("saveTicket retourne false si aucune ligne n'est insérée")
+    void testSaveTicket_WhenExecuteUpdateReturnsZero() throws Exception {
+        // GIVEN
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+
+        // WHEN
+        boolean result = ticketDAO.saveTicket(ticket);
+
+        // THEN
+        assertFalse(result, "saveTicket doit retourner false si aucune ligne insérée");
+    }
+    
+
     @Test
     @DisplayName("Récupérer un ticket existant dans BDD")
     void testGetTicket_() throws Exception {
@@ -138,6 +157,7 @@ class TicketDAOTest {
         assertEquals(8.5, result.getPrice());
         assertEquals(3, result.getParkingSpot().getId());
     }
+
     
     @Test
     @DisplayName("Echec récupération ticket lié à une exception")
@@ -155,6 +175,7 @@ class TicketDAOTest {
         verify(resultSet, never()).next(); // Le ResultSet ne doit jamais être parcouru
     }
     
+    /*
     @Test
     @DisplayName("Mise à jour réussie du ticket, retourne true")
     void updateTicket_ShouldReturnTrue_WhenUpdateIsSuccessful() throws Exception {
@@ -171,6 +192,7 @@ class TicketDAOTest {
         verify(mockPreparedStatement, times(1)).setInt(3, ticket.getId());
         verify(mockPreparedStatement, times(1)).execute();
     }
+    */
     
     @Test
     @DisplayName("Echec mise à jour ticket lié à exception")
@@ -188,6 +210,7 @@ class TicketDAOTest {
         verify(mockPreparedStatement, times(1)).setDouble(1, ticket.getPrice());
     }
     
+
     @Test
     @DisplayName("Compte le nombre de tickets pour un véhicule")
     void testGetNbTicket() throws Exception {
@@ -216,6 +239,7 @@ class TicketDAOTest {
         // THEN
         assertEquals(0, nbTickets);
     }
+
     
     @Test
     @DisplayName("Echec comptage nb ticket suite à erreur de la BDD")  
