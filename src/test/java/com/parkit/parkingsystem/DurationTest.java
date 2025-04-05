@@ -2,7 +2,7 @@ package com.parkit.parkingsystem;
 
 import org.junit.jupiter.api.Test;
 
-import com.parkit.parkingsystem.service.Duration;
+import com.parkit.parkingsystem.util.Duration;
 
 import java.util.Date;
 

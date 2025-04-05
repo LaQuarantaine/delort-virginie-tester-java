@@ -1,4 +1,4 @@
-package com.parkit.parkingsystem;
+package com.parkit.parkingsystem.dao;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 

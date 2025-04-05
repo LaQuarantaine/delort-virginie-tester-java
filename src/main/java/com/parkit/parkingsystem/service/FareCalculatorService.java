@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
-import com.parkit.parkingsystem.dao.TicketDAO;
+import com.parkit.parkingsystem.util.Duration;
 
 public class FareCalculatorService {
 
