@@ -25,8 +25,6 @@ public class FareCalculatorServiceTest {
     }
 
 
-    // US1 – En tant qu’utilisateur CAR, je veux que mon tarif soit calculé 
-    // pour une heure complète et au tarif CAR
     @Test
     @DisplayName("Vérifier que le tarif voiture pour 1h est bien calculé")
     public void calculateFareCar(){
@@ -38,8 +36,6 @@ public class FareCalculatorServiceTest {
     }
 
     
-    // US2 – En tant qu’utilisateur BIKE, je veux que mon tarif soit calculé 
-    // pour une heure complète et au tarif BIKE
     @Test
     @DisplayName("Vérifier que le tarif moto pour 1h est bien calculé")
     public void calculateFareBike(){
@@ -50,8 +46,7 @@ public class FareCalculatorServiceTest {
         assertEquals(Fare.BIKE_RATE_PER_HOUR, ticket.getPrice());
     }
 
-    // US8 – En tant que gestionnaire, je veux que le système gère les exceptions 
-    // sur les véhicules non prévus
+
     @Test
     @DisplayName("Vérifier que calculateFare() lève une exception si le type de véhicule est inconnu")
     public void calculateFareUnkownType(){
@@ -60,8 +55,7 @@ public class FareCalculatorServiceTest {
         assertThrows(NullPointerException.class, () -> fareCalculatorService.calculateFare(ticket));
     }
     
-    // US9 – En tant que gestionnaire, je veux que le système gère une exception si l'heure d'entrée 
-    // est postérieure à l'heure de sortie
+
     @Test
     @DisplayName("Vérifier que calculateFare() lève une exception si inTime est dans le futur")
     public void calculateFareBikeWithFutureInTime(){
@@ -70,7 +64,7 @@ public class FareCalculatorServiceTest {
         assertThrows(IllegalArgumentException.class, () -> fareCalculatorService.calculateFare(ticket));
     }
     
-    // US4 – En tant qu’utilisateur BIKE, je veux une facturation proportionnelle si je reste moins d’une heure
+
     @Test
     @DisplayName("Vérifier que le tarif est proportionnel pour un stationnement moto de 45 minutes")
     public void calculateFareBikeWithLessThanOneHourParkingTime(){
@@ -81,7 +75,7 @@ public class FareCalculatorServiceTest {
         assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice() );
     }
     
-    // US6 – Cas extrême : 24h de stationnement CAR
+
     @Test
     @DisplayName("Vérifier que le tarif est correct pour 24h de stationnement voiture")
     public void calculateFareCarWithMoreThanADayParkingTime(){
@@ -94,7 +88,6 @@ public class FareCalculatorServiceTest {
     }
     
     
-    // US3 – En tant qu’utilisateur BIKE, je veux que le stationnement < 30 min soit gratuit
     @Test
     @DisplayName("Vérifier que le tarif est gratuit pour une moto stationnée moins de 30 minutes")
     public void calculateFareBikeWithLessThan30minutesParkingTime(){
@@ -105,7 +98,7 @@ public class FareCalculatorServiceTest {
         assertEquals(0.0, ticket.getPrice());
     }
     
-    // US3 – En tant qu’utilisateur CAR, je veux que le stationnement < 30 min soit gratuit
+
     @Test
     @DisplayName("Vérifier que le tarif est gratuit pour une voiture stationnée moins de 30 minutes")
     public void calculateFareCarWithLessThan30minutesParkingTime(){
@@ -116,7 +109,7 @@ public class FareCalculatorServiceTest {
         assertEquals(0.0, ticket.getPrice());
     }
     
-    // US5 – En tant qu’utilisateur CAR régulier, je veux bénéficier de la remise prévue
+
     @Test
     @DisplayName("Vérifier que la remise est bien appliquée pour une auto")
     public void calculateFareCarWithDiscount(){
@@ -129,7 +122,7 @@ public class FareCalculatorServiceTest {
         assertEquals((bd.doubleValue()), ticket.getPrice());
     }
     
-    // US5 – En tant qu’utilisateur BIKE régulier, je veux bénéficier de la remise prévue
+
     @Test
     @DisplayName("Vérifier que la remise est bien appliquée pour une moto")
     public void calculateFareBikeWithDiscount(){
@@ -145,7 +138,6 @@ public class FareCalculatorServiceTest {
     }
 
 
-    // US6 – En tant qu’utilisateur CAR, je veux que la durée soit bien calculée pour une durée de 2h
     @Test
     @DisplayName("Vérifier que le tarif voiture est bien calculé pour 2h")
     public void calculateFareCarWithTwoOneHourParkingTime(){
@@ -159,7 +151,6 @@ public class FareCalculatorServiceTest {
     }
 
     
-    // US8 – En tant que gestionnaire, je veux que le système gère les tickets invalides (null ticket)
     @Test
     @DisplayName("Vérifier que calculateFare() lève une exception si le ticket est null")
     public void calculateFare_NullTicket_ShouldThrow() {
@@ -167,7 +158,6 @@ public class FareCalculatorServiceTest {
     }
     
     
-    // US8 – En tant que gestionnaire, je veux que le système gère les tickets invalides (inTime null)
     @Test
     @DisplayName("Vérifier que calculateFare() lève une exception si inTime est null")
     public void calculateFare_NullInTime_ShouldThrow() {
@@ -175,6 +165,7 @@ public class FareCalculatorServiceTest {
     	    	
         assertThrows(IllegalArgumentException.class, () -> fareCalculatorService.calculateFare(ticket));
     }
+    
     
     private Ticket createTicket(Date inTime, Date outTime, ParkingSpot parkingSpot) {
     	Ticket ticket = new Ticket();

@@ -120,7 +120,7 @@ public class TicketDAO {
     	return nbTickets;
     }
 
-    // ajout d'une méthode pour contrôler l'unicité d'une immatriculation
+    // contrôler l'unicité d'une immatriculation
 	public boolean isVehicleAlreadyParked(String vehicleRegNumber) {
 		boolean vehicleAlreadyParked = false;
 		

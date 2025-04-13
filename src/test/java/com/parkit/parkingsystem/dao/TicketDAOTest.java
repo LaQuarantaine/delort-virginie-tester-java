@@ -18,14 +18,14 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class) // Permet d'utiliser Mockito avec JUnit 5
+@ExtendWith(MockitoExtension.class) 
 class TicketDAOTest {
 
     @InjectMocks
-    private TicketDAO ticketDAO; // Classe testée
+    private TicketDAO ticketDAO; 
 
     @Mock
-    private DataBaseConfig mockDataBaseConfig; // Mock de la config DB
+    private DataBaseConfig mockDataBaseConfig; 
 
     @Mock
     private Connection mockConnection;
@@ -175,24 +175,6 @@ class TicketDAOTest {
         verify(resultSet, never()).next(); // Le ResultSet ne doit jamais être parcouru
     }
     
-    /*
-    @Test
-    @DisplayName("Mise à jour réussie du ticket, retourne true")
-    void updateTicket_ShouldReturnTrue_WhenUpdateIsSuccessful() throws Exception {
-        // GIVEN
-        when(mockPreparedStatement.execute()).thenReturn(true);
-
-        // WHEN
-        boolean result = ticketDAO.updateTicket(ticket);
-
-        // THEN
-        assertTrue(result);
-        verify(mockPreparedStatement, times(1)).setDouble(1, ticket.getPrice());
-        verify(mockPreparedStatement, times(1)).setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
-        verify(mockPreparedStatement, times(1)).setInt(3, ticket.getId());
-        verify(mockPreparedStatement, times(1)).execute();
-    }
-    */
     
     @Test
     @DisplayName("Echec mise à jour ticket lié à exception")
